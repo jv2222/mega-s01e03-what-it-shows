@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 · what it shows: three problems, not one'
 owner: jv2222
-status: proposed
+status: closed
 reviewed: 2026-10-27
 signature: 'v1.eyJzdWIiOiI5MjciLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhdCI6MTc5MzE2NDcwNywiZXhwIjoxNzkzMjUxMTA3fQ.9PFalqFpe4gEIVAbxusLwiK7mkKJylSXvM9rIy2u7Jw'
 ---
@@ -14,13 +14,13 @@ signature: 'v1.eyJzdWIiOiI5MjciLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhd
 
   const repo = 'https://github.com/jv2222/mega-s01e03-what-it-shows';
   const tickets = {
-    parser: { issue: 1, url: `${repo}/issues/1` },
-    hint: { issue: 2, url: `${repo}/issues/2` },
-    'one-day-move': { issue: 3, url: `${repo}/issues/3` },
+    parser: { issue: 1, url: `${repo}/issues/1`, outcome: 'fixed 5 Oct' },
+    hint: { issue: 2, url: `${repo}/issues/2`, outcome: "won't fix: form retired" },
+    'one-day-move': { issue: 3, url: `${repo}/issues/3`, outcome: 'closed with #4471, no fix named' },
   };
 </script>
 
-[#4471](/kb/incidents/4471) says one issue, one fix queued. The reports in it say three.
+[#4471](/kb/incidents/4471) said one issue, one fix queued. The reports in it say three. Engineering closed #4471 on 5 October with two outcomes, one per problem it knew about.
 This page is built from the same export the desk reads, so the numbers below move when the
 desk merges more.
 
@@ -67,11 +67,22 @@ three problems, and none of them names a problem, so every report matched an ope
 nobody read a body. [Decision 0001](/kb/decisions/0001-dedupe-by-subject) accepts that reports with
 different subjects split; it did not expect reports with the same subject to hide different bugs.
 
-## What to do
+## What the desk did
 
-1. Keep #4471 for `parser` only, with its count from the table above.
-2. Open one ticket each for `hint` and `one-day-move` (filed as the tickets linked in the table).
-3. When a fix ships, close its ticket and re-run this page: a count that does not fall to zero
-   means the fix missed.
+Engineering closed #4471 on 5 October:
+
+- `parser`: **fixed**, `fix(dates): parse dd/mm for eu locales`. Ticket #1 is closed as fixed.
+- `hint`: **won't fix**, the booking-v3 form is retired. Ticket #2 is closed as not planned: the
+  form that printed the wrong hint no longer exists, so no new report can come through it.
+- `one-day-move`: not named. Its five reports were closed inside #4471 under the parser fix.
+  Ticket #3 is closed as not planned to match the desk, with a note to reopen it if a one-day
+  shift is reported after the parser fix.
+
+## What to do next
+
+1. Re-run this page on the next export. The `parser` row must stop growing after 5 October.
+2. A report of a one-day shift after 5 October reopens #3. The [dedupe rule](/kb/triage/dedupe)
+   must not merge it into a closed ticket.
+3. Next time a ticket passes a few hundred reports, run `groupByProblem` before marking it known.
 
 <RenderStamp {signature} />

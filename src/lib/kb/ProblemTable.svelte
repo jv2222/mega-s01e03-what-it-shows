@@ -5,7 +5,7 @@
   import { exportDuplicates, groupByProblem, type Problem } from '#lib/kb/problems';
   import { tenantOf } from '#lib/kb/locales';
 
-  type Ticket = { issue: number; url: string };
+  type Ticket = { issue: number; url: string; outcome: string };
   let { ticket, tickets }: { ticket: number; tickets: Partial<Record<Problem, Ticket>> } = $props();
 
   const raw = reports as Report[];
@@ -29,7 +29,7 @@
 
 <table>
   <thead>
-    <tr><th>problem</th><th>reports</th><th>share</th><th>tenants</th><th>way in</th><th>intake tagged as</th><th>seen</th><th>ticket</th></tr>
+    <tr><th>problem</th><th>reports</th><th>share</th><th>tenants</th><th>way in</th><th>intake tagged as</th><th>seen</th><th>ticket</th><th>outcome</th></tr>
   </thead>
   <tbody>
     {#each groups as g (g.problem)}
@@ -43,6 +43,7 @@
         <td class="tags">{counts(g.taggedAs)}</td>
         <td>{g.firstSeen} → {g.lastSeen}</td>
         <td>{#if t}<a href={t.url}>#{t.issue}</a>{:else}none{/if}</td>
+        <td>{t?.outcome ?? ""}</td>
       </tr>
     {/each}
   </tbody>
