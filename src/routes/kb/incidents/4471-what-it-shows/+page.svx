@@ -1,0 +1,77 @@
+---
+layout: runbook
+title: '#4471 · what it shows: three problems, not one'
+owner: jv2222
+status: proposed
+reviewed: 2026-10-27
+signature: 'v1.eyJzdWIiOiI5MjciLCJhdWQiOiJjaGFsbGVuZ2U6d2hhdC1pdC1zaG93cyIsImlhdCI6MTc5MzE2NDcwNywiZXhwIjoxNzkzMjUxMTA3fQ.9PFalqFpe4gEIVAbxusLwiK7mkKJylSXvM9rIy2u7Jw'
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const repo = 'https://github.com/jv2222/mega-s01e03-what-it-shows';
+  const tickets = {
+    parser: { issue: 1, url: `${repo}/issues/1` },
+    hint: { issue: 2, url: `${repo}/issues/2` },
+    'one-day-move': { issue: 3, url: `${repo}/issues/3` },
+  };
+</script>
+
+[#4471](/kb/incidents/4471) says one issue, one fix queued. The reports in it say three.
+This page is built from the same export the desk reads, so the numbers below move when the
+desk merges more.
+
+<Callout kind="warn">
+Three problems share this ticket. Each one needs its own ticket, because one fix closes one of
+them and leaves the other two open.
+</Callout>
+
+## What the reports hold
+
+<ProblemTable ticket={4471} {tickets} />
+
+## The three problems
+
+**`parser`: the shared parser reads every date month first.** Our tenants write the day
+first, so 7 April becomes 4 July. This is the problem #4471 describes, and it is most of the
+ticket. It reaches people through the app, by email and through the booking-v2 form.
+
+**`hint`: the booking-v3 form prints `MM/DD/YYYY` under its date field and then reads the
+field the tenant's way.** People type what the hint tells them, month first, and the form flips
+it back. Only the three tenants on booking-v3 see it, and only through the form. The parser fix
+does not touch this: the form has already stored the wrong day before the parser runs.
+
+**`one-day-move`: the invite lands one day off, not one month off.** Lisbon gets Tuesday and
+Toronto gets Monday for the same meeting; one invite arrived before its booking was made. That is
+a time zone or day boundary, not a day/month swap. The desk already read these five reports as a
+one-day move (`desk-notes.json`) but filed them under `parser` by tenant. Here they count once,
+under their own problem.
+
+## How the counts are made
+
+- One id, one report: the export pages overlap, so `uniqueById` drops the repeated rows first.
+- A report's problem comes from its tenant and its way in (`causes.ts`), not from the intake
+  tag. Intake guesses from the reporter's browser locale and is wrong on the reports whose
+  browser locale differs from the tenant's locale.
+- A report the desk read as a one-day move (`desk-notes.json`) is its own problem and is not
+  counted under `parser` again.
+- Every report sits in exactly one problem, so the three counts add up to the merged total.
+
+## Why the desk missed it
+
+The [dedupe rule](/kb/triage/dedupe) merges on subject line alone. Twelve subject lines cover all
+three problems, and none of them names a problem, so every report matched an open ticket and
+nobody read a body. [Decision 0001](/kb/decisions/0001-dedupe-by-subject) accepts that reports with
+different subjects split; it did not expect reports with the same subject to hide different bugs.
+
+## What to do
+
+1. Keep #4471 for `parser` only, with its count from the table above.
+2. Open one ticket each for `hint` and `one-day-move` (filed as the tickets linked in the table).
+3. When a fix ships, close its ticket and re-run this page: a count that does not fall to zero
+   means the fix missed.
+
+<RenderStamp {signature} />
